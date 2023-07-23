@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if errors %}
+        {{ errors }}
+    {%  endif %}
+    <form action="/login" method="post" class="form-horizontal">
+        <div class="form-group">
+            <label for="username">Username</label><br>
+            <input type="text" name="username" class="form-control input-sm" required placeholder="Username"><br>
+            <label for="password">Password</label><br>
+            <input type="password" name="password" class="form-control input-sm" required placeholder="Password"><br>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+{% endblock content %}

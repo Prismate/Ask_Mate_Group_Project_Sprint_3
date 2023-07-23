@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h3>{{ user['username'] }}</h3>
+    <p>Reputation: {{ user['reputation'] }}</p>
+    <table class="table">
+        <tr>
+            <th>Questions ({{ questions|length }})</th>
+            <th>Submission time</th>
+        </tr>
+        <tbody>
+        {% for question in questions %}
+            <tr>
+                <td><a href="/question/{{ question['id'] }}">{{ question['title'] }}</a></td>
+                <td>{{ question['submission_time'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="table">
+        <tr>
+            <th>Answers ({{ answers|length }})</th>
+            <th>Submission time</th>
+        </tr>
+        <tbody>
+        {% for answer in answers %}
+            <tr>
+                <td><a href="/question/{{ answer['question_id'] }}">{{ answer['message'] }}</a></td>
+                <td>{{ answer['submission_time'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <table class="table">
+        <tr>
+            <th>Comments ({{ comments|length }})</th>
+            <th>Submission time</th>
+        </tr>
+        <tbody>
+        {% for comment in comments %}
+            <tr>
+                <td><a href="/question/{{ comment['question_id'] }}">{{ comment['message'] }}</a></td>
+                <td>{{ comment['submission_time'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block content %}
+{#    <div style="display: inline"><strong>{{ title }}</strong></div>#}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0">{{ title }}</h1>
+        <div id="sort_params">
+            <label for="sort_key" class="mr-2">Order by:</label>
+            <select class="custom-select" name="sort_key" id="sort_key">
+                <option value="submission_time">Submission time</option>
+                <option value="title">Title</option>
+                <option value="message">Message</option>
+                <option value="vote_number">Vote_number</option>
+            </select>
+        </div>
+    </div>
+    {% if questions %}
+    <table class="table">
+
+        <tbody>
+        {% for question in questions %}
+            <tr>
+                <td>
+                    <div class="question_title">
+                        <a href="/question/{{ question['id'] }}">{{ question['title'] }}</a>
+                    </div>
+                </td>
+
+                <td>
+                    <div id="actions">
+                        {% if session['user_id'] == question['user_id'] %}
+                            <button type="button" title="Edit" class="btn btn-sm btn-outline-primary action_button mb-1"
+                                    onclick="window.location.href='/question/{{ question['id'] }}/edit'">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <form action="/question/{{ question['id'] }}/delete" method="post">
+                                <button type="submit" title="Delete"
+                                        class="btn btn-sm btn-outline-primary action_button mb-1">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                        <form action="/question/{{ question['id'] }}/vote-up" method="post">
+                            <button type="submit" title="Vote Up"
+                                    class="btn btn-sm btn-outline-primary action_button mb-1">
+                                <i class="fa fa-thumbs-up"></i>
+                            </button>
+                        </form>
+                        <form action="/question/{{ question['id'] }}/vote-down" method="post">
+                            <button type="submit" title="Vote Down"
+                                    class="btn btn-sm btn-outline-primary action_button mb-1">
+                                <i class="fa fa-thumbs-down"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="question_message">{{ question['message'] }}</div>
+                </td>
+                <td>
+                    {% if question['image'] %}
+                        <img src="{{ url_for('static', filename='images/'+ question['image']) }}" class="question_image"
+                             height="auto"/>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+            {% if question['tags'] %}
+                <td class="question_tags">tags:
+                    {% for tag in question['tags'] %}
+                        <span class="badge badge-pill badge-primary">{{ tag['name'] }}</span>
+                    {% endfor %}
+                </td>
+            {% endif %}
+            </tr>
+            <tr class="question_stats">
+                <td colspan="2">
+                    Added by <a href="/user/{{ question['user_id'] }}">{{ question['username'] }}</a>({{ question['reputation'] }})
+                    on: {{ question['submission_time'] }}
+                    <div id="question_votes">
+                        Views: {{ question['view_number'] }} / Votes: {{ question['vote_number'] }} / <a
+                            href="/question/{{ question['id'] }}">Comments</a>: {{ question['comments'] }}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+    {% else %}
+            <h1 class="h3 mb-0">No Results</h1>
+    {% endif %}
+    <button type="button" class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+            onclick="window.location.href='/add-question'">
+        <i class="fa fa-comment"></i>Add question
+    </button>
+
+{% endblock content %}
+
+
+
+

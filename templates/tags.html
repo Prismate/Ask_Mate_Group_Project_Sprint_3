@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <table class="table">
+        <tr>
+            <th>TAG</th>
+            <th>Number of tagged questions</th>
+        </tr>
+        <tbody>
+        {% for tag in tags %}
+            <tr>
+                <td>{{ tag['name'] }}</td>
+                <td>{{ tag['counter'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

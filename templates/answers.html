@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if question %}
+        <h2>{{ question[0]['title'] }}</h2>
+        <pre>ID: {{ question[0]['id'] }}, Added by <strong>{{ question[0]['username'] }}</strong>({{ question[0]['reputation'] }}) on {{ question[0]['submission_time'] }}</pre>
+        <p>{{ question[0]['message'] }}</p>
+        {% if question[0]['image'] %}
+            <img alt="question image" src="{{ url_for('static', filename='images/'+ question[0]['image']) }}"
+                 class="question_image"/>
+        {% endif %}
+    {% endif %}
+    <div id="actions">
+        <button type="button" tile="Reply" class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+                onclick="window.location.href='/question/{{ question[0]['id'] }}/new-answer'">
+            <i class="fa fa-reply-all"></i>Add answer
+        </button>
+        <button type="button" title="Comment" class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+                onclick="window.location.href='/question/{{ question[0]['id'] }}/new-comment'">
+            <i class="fa fa-comment"></i>Add comment
+        </button>
+        <button type="button" title="Add tags"
+                class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+                onclick="window.location.href='/question/{{ question[0]['id'] }}/new-tag'">
+            <i class="fa fa-tags"></i>Add tag
+        </button>
+    </div>
+    <hr>
+    {% if comments %}
+        <h6>Comments</h6>
+        <div class="question_comments">
+            {% for comment in comments %}
+                {% if session['user_id'] == comment['user_id'] %}
+                    <div id="comment-actions">
+                        <button type="button" title="Edit comment"
+                                class="btn btn-sm btn-outline-primary action_button mb-1"
+                                onclick="window.location.href='/comment/{{ comment['id'] }}/edit'">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" title="Delete comment"
+                                class="btn btn-sm btn-outline-primary action_button mb-1"
+                                onclick="window.location.href='/comment/{{ comment['id'] }}/delete'">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                {% endif %}
+                <div class="content-section">
+                    On {{ comment['submission_time'] }}
+                    <strong>{{ comment['username'] }}</strong>({{ comment['reputation'] }}) commented:
+                    {% if comment['edited_count'] > 0 %}
+                        /edited {{ comment['edited_count'] }} times/
+                    {% endif %}
+                    <br>
+                    {{ comment['message'] }}
+
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+    {% if tags %}
+        <h6>Tags</h6>
+        <div class="tags">
+            {% for tag in tags %}
+                <div class="question_tags"><span class="badge badge-pill badge-primary">{{ tag['name'] }}</span></div>
+                <div class="delete_question_tag"><a
+                        href="/question/{{ question[0]['id'] }}/tag/{{ tag['id'] }}/delete">X</a></div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if answers %}
+        <h3>Answers:</h3>
+        <table class="table responsive">
+            <tr>
+                <th>Message</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+            <tbody>
+            {% for answer in answers %}
+                <tr>
+                    <td>
+                        <div class="answer_message">
+                            <strong>
+                                {% if answer['is_accepted'] == True %}
+                                    <i class="fa fa-check" aria-hidden="true" style="color: springgreen;"></i>
+                                {% endif %}
+                                {{ answer['message'] }}</strong>
+                        </div>
+                        <div class="answer_details">
+                            Added on: {{ answer['submission_time'] }} by <a
+                                href="/user/{{ answer['user_id'] }}">{{ answer['username'] }}</a>({{ answer['reputation'] }})
+                        </div>
+                        <div id="answer_votes">
+                            Votes: {{ answer['vote_number'] }} /
+                                Comments: {{ answer['comments']|length }}
+                        </div>
+
+                    </td>
+                    <td>
+                        {% if answer['image'] %}
+                            <img alt="answer image" src="{{ url_for('static', filename='images/'+ answer['image']) }}"
+                                 class="answer_image"/>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div id="actions">
+                            {% if session['user_id'] == answer['user_id'] or session['user_id'] == question[0]['user_id'] %}
+                                <button type="button" title="Edit"
+                                        class="btn btn-sm btn-outline-primary action_button mb-1"
+                                        onclick="window.location.href='/answer/{{ answer['id'] }}/edit'">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                            {% endif %}
+                            {% if session['user_id'] == answer['user_id'] %}
+                                <form action="/answer/{{ answer['id'] }}/delete" method="post">
+                                    <button type="submit" title="Delete"
+                                            class="btn btn-sm btn-outline-primary action_button mb-1">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if session['user_id'] == question[0]['user_id'] %}
+                                <form action="/answer/{{ answer['id'] }}/toogle_accept_answer" method="post">
+                                {% if answer['is_accepted'] == False %}
+                                    <button type="submit" title="Accept"
+                                            class="btn btn-sm btn-outline-primary action_button mb-1 accepted">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" title="Un-Accept"
+                                            class="btn btn-sm btn-outline-primary action_button mb-1">
+                                        <i class="fa fa-eye-slash"></i>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                            <form action="/answer/{{ answer['id'] }}/vote-up" method="post">
+                                <button type="submit" title="Vote Up"
+                                        class="btn btn-sm btn-outline-primary action_button mb-1">
+                                    <i class="fa fa-thumbs-up"></i>
+                                </button>
+                            </form>
+                            <form action="/answer/{{ answer['id'] }}/vote-down" method="post">
+                                <button type="submit" title="Vote Down"
+                                        class="btn btn-sm btn-outline-primary action_button mb-1">
+                                    <i class="fa fa-thumbs-down"></i>
+                                </button>
+                            </form>
+                            {% if session['user_id'] %}
+                                <button type="button" title="Add comment"
+                                        class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+                                        onclick="window.location.href='/answer/{{ answer['id'] }}/new-comment'">
+                                    <i class="fa fa-comment"></i>
+                                </button>
+                            {% endif %}
+
+                        </div>
+
+
+                    </td>
+                </tr>
+                {% if  answer['comments'] %}
+                    <tr>
+                        <td colspan="3">
+                            <h6>Comments</h6>
+                            <div class="answer_comments">
+                                {% for comment in answer['comments'] %}
+                                    <div class="content-section">
+                                        <p style="font-size:0.8em">User
+                                            <strong>{{ comment['username'] }}</strong>({{ answer['reputation'] }})
+                                            commented
+                                            on {{ comment['submission_time'] }}:
+                                            {% if comment['edited_count'] > 0 %}
+                                                /edited {{ comment['edited_count'] }} times/
+                                            {% endif %}
+
+                                            <br>{{ comment['message'] }}
+                                        </p>
+                                        {% if session['user_id'] == comment['user_id'] %}
+                                            <button type="button" title="Edit comment"
+                                                    class="btn btn-sm btn-outline-primary action_button mb-1"
+                                                    onclick="window.location.href='/comment/{{ comment['id'] }}/edit'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" title="Delete comment"
+                                                    class="btn btn-sm btn-outline-primary action_button mb-1"
+                                                    onclick="window.location.href='/comment/{{ comment['id'] }}/delete'">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <h3>Nobody answered this question</h3>
+    {% endif %}
+    <hr>
+    <button type="button" tile="Reply" class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+            onclick="window.location.href='/question/{{ question[0]['id'] }}/new-answer'">
+        <i class="fa fa-reply-all"></i>Add answer
+    </button>
+    <button type="button" title="Comment" class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+            onclick="window.location.href='/question/{{ question[0]['id'] }}/new-comment'">
+        <i class="fa fa-comment"></i>Add comment
+    </button>
+    <button type="button" title="Add tags"
+            class="btn btn-sm btn-outline-primary btn-custom-width mb-1"
+            onclick="window.location.href='/question/{{ question[0]['id'] }}/new-tag'">
+        <i class="fa fa-tags"></i>Add tag
+    </button>
+{% endblock content %}

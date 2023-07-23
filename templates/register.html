@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if errors %}
+        {{ errors }}
+    {%  endif %}
+    <form action="/register" method="post" class="form-horizontal">
+        <div class="form-group">
+            <label for="username">Username</label><br>
+            <input type="text" name="username" class="form-control input-sm" required placeholder="Username"><br>
+            <label for="password">Password</label><br>
+            <input type="password" name="password" class="form-control input-sm" required placeholder="Password"><br>
+            <label for="repeat_password">Confirm password</label><br>
+            <input type="password" name="repeat_password" class="form-control input-sm" required placeholder="Confirm password"><br>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+    </form>
+{% endblock content %}
